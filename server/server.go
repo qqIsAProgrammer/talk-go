@@ -11,7 +11,7 @@ import (
 )
 
 type RPCServer struct {
-	addr string
+	addr  string
 	funcs map[string]reflect.Value
 }
 
@@ -22,6 +22,7 @@ func NewServer(addr string) *RPCServer {
 	}
 }
 
+// Register the name of the function and its entries.
 func (s *RPCServer) Register(fnName string, fFunc interface{}) {
 	if _, ok := s.funcs[fnName]; ok {
 		return
@@ -29,6 +30,7 @@ func (s *RPCServer) Register(fnName string, fFunc interface{}) {
 	s.funcs[fnName] = reflect.ValueOf(fFunc)
 }
 
+// execute the given function if present.
 func (s *RPCServer) execute(req serial.RPCData) serial.RPCData {
 	f, ok := s.funcs[req.Name]
 	if !ok {
@@ -43,8 +45,11 @@ func (s *RPCServer) execute(req serial.RPCData) serial.RPCData {
 		inArgs[i] = reflect.ValueOf(req.Args[i])
 	}
 
+	// invoke requested method
 	out := f.Call(inArgs)
 
+	// now since we have followed the function signature style where last argument will be an error
+	// so we will pack the response arguments expect error.
 	resArgs := make([]interface{}, len(out)-1)
 	for i := 0; i < len(out)-1; i++ {
 		resArgs[i] = out[i].Interface()
@@ -57,6 +62,7 @@ func (s *RPCServer) execute(req serial.RPCData) serial.RPCData {
 	return serial.RPCData{Name: req.Name, Args: resArgs, Err: err}
 }
 
+// Run server
 func (s *RPCServer) Run() {
 	l, err := net.Listen("tcp", s.addr)
 	if err != nil {

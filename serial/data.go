@@ -5,12 +5,15 @@ import (
 	"encoding/gob"
 )
 
+// RPCData represents the serializing format of structured data.
 type RPCData struct {
-	Name string
-	Args []interface{}
-	Err  string
+	Name string        // name of the function
+	Args []interface{} // request's or response's body expect error
+	Err  string        // error any executing remote server
 }
 
+// Encode the RPCData in binary format which can
+// be sent over the network.
 func Encode(data RPCData) ([]byte, error) {
 	var buf bytes.Buffer
 	enc := gob.NewEncoder(&buf)
@@ -20,6 +23,7 @@ func Encode(data RPCData) ([]byte, error) {
 	return buf.Bytes(), nil
 }
 
+// Decode the binary data into the Go RPC struct.
 func Decode(b []byte) (RPCData, error) {
 	buf := bytes.NewBuffer(b)
 	dec := gob.NewDecoder(buf)

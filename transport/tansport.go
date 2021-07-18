@@ -6,11 +6,12 @@ import (
 	"net"
 )
 
-// Transport uses TLV protocol
+// Transport uses TLV protocol.
 type Transport struct {
-	conn net.Conn
+	conn net.Conn // conn is a generic stream-oriented network connection.
 }
 
+// NewTransport creates a Transport
 func NewTransport(conn net.Conn) *Transport {
 	return &Transport{conn}
 }
@@ -18,7 +19,7 @@ func NewTransport(conn net.Conn) *Transport {
 // Send TLV encoded data over the network.
 func (t *Transport) Send(data []byte) error {
 	// we will need 4 more byte then the len of data
-	// as TLV header is 4bytes and in this header
+	// as TLV header is 4 bytes and in this header.
 	// we will encode how much byte of data
 	// we are sending for this request.
 	buf := make([]byte, 4+len(data))

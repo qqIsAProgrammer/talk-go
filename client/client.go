@@ -16,6 +16,7 @@ func NewClient(conn net.Conn) *Client {
 	return &Client{conn}
 }
 
+// CallRPC method.
 func (c *Client) CallRPC(rpcName string, fPtr interface{}) {
 	container := reflect.ValueOf(fPtr).Elem()
 
